@@ -29,14 +29,17 @@ describe('<HomePage />', () => {
 		const catsList = screen.getAllByRole('cat');
 		expect(catsList.length).toBe(mockData.length);
 
-		catsList.forEach((cat) => {
-			const catImage = screen.getByAltText(cat.id);
-			expect(catImage).toBeInTheDocument();
-			expect(catImage).toHaveAttribute('src', cat.url);
-		});
+		expect(catsList[0]).toHaveAttribute(
+			'src',
+			'https://cdn2.thecatapi.com/images/8pCFG7gCV.jpg'
+		);
+		expect(catsList[1]).toHaveAttribute(
+			'src',
+			'https://cdn2.thecatapi.com/images/8ciqdpaO5.jpg'
+		);
 
 		const viewDetailsButton = screen.getAllByRole('button', {
-			name: 'Load more',
+			name: 'View details',
 		});
 		expect(viewDetailsButton.length).toBe(mockData.length);
 
