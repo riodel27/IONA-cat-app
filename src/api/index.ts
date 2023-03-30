@@ -25,4 +25,18 @@ const fetchCatsByBreed = async ({
 	}
 };
 
-export default fetchCatsByBreed;
+const fetchCatById = async (catId: string): Promise<Cat> => {
+	try {
+		const response: AxiosResponse<Cat> = await axios.get(
+			`https://api.thecatapi.com/v1/images/${catId}`
+		);
+
+		return response?.data;
+	} catch (error) {
+		// Handle error here
+		console.error('Error fetching cat: ', error);
+		throw new Error('Unable to fetch cat. Please try again later.');
+	}
+};
+
+export { fetchCatsByBreed, fetchCatById };

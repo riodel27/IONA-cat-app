@@ -1,5 +1,6 @@
-import { describe, test, expect } from 'vitest';
+import { describe, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
 import { Cat } from '../../src/types/types';
 import CatCard from '../../src/components/CatCard';
@@ -22,8 +23,12 @@ const catMockData: Cat = {
 };
 
 describe('CatCard', () => {
-	test('should render the card with cat information', () => {
-		render(<CatCard cat={catMockData} />);
+	it('should render the card with cat information', () => {
+		render(
+			<MemoryRouter>
+				<CatCard cat={catMockData} />
+			</MemoryRouter>
+		);
 
 		const backButton = screen.getByText('Back');
 		expect(backButton).toBeInTheDocument();

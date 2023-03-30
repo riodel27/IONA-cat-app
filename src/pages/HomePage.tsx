@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { differenceWith, isEqual } from 'lodash';
 
-import fetchCatsByBreed from '../api';
+import { fetchCatsByBreed } from '../api';
 import BreedSelect from '../components/BreedSelect';
 import CatList from '../components/CatList/CatList';
 import { Cat, CatBreed } from '../types/types';

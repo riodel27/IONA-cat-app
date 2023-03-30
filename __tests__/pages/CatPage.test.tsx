@@ -1,8 +1,10 @@
-import { describe, test, expect, vi } from 'vitest';
+import { describe, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import axios, { AxiosHeaders, AxiosResponse } from 'axios';
+
 import { Cat } from '../../src/types/types';
+import CatPage from '../../src/pages/CatPage';
 
 vi.mock('axios');
 
@@ -28,20 +30,7 @@ const catMockData: Cat = {
 };
 
 describe('<CatPage />', () => {
-	test('renders the correct URL for single cat page', () => {
-		const id = 'd55E_KMKZ';
-
-		<MemoryRouter initialEntries={[`/${id}`]}>
-			<Routes>
-				<Route path="/:id" element={<CatPage />}></Route>
-			</Routes>
-		</MemoryRouter>;
-
-		const url = window.location.pathname;
-		expect(url).toBe(`/${id}`);
-	});
-
-	test('should fetch cat data and display it in cat card component', async () => {
+	it('should fetch cat data and display it in cat card component', async () => {
 		const mockResponse: AxiosResponse<Cat> = {
 			data: catMockData,
 			status: 200,
@@ -51,12 +40,17 @@ describe('<CatPage />', () => {
 				headers,
 			},
 		};
-
 		(axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce(
 			mockResponse
 		);
 
-		render(<CatPage />);
+		render(
+			<MemoryRouter initialEntries={[`/${catMockData.id}`]}>
+				<Routes>
+					<Route path="/:id" element={<CatPage />} />
+				</Routes>
+			</MemoryRouter>
+		);
 
 		// Wait for the mocked response to resolve and the component to re-render with the fetched cat data displayed
 		await waitFor(() => {
@@ -70,19 +64,16 @@ describe('<CatPage />', () => {
 				catMockData.breeds?.[0]?.name ?? ''
 			);
 			expect(catBreedName).toBeInTheDocument();
-
 			const catBreedOriginElement = screen.getByRole('heading', {
 				name: /origin/i,
 			});
 			expect(catBreedOriginElement).toHaveTextContent(
 				catMockData.breeds?.[0]?.origin ?? ''
 			);
-
 			const catBreedTemperament = screen.getByText(
 				catMockData.breeds?.[0]?.temperament ?? ''
 			);
 			expect(catBreedTemperament).toBeInTheDocument();
-
 			const catBreedDescription = screen.getByText(
 				catMockData.breeds?.[0]?.description ?? ''
 			);

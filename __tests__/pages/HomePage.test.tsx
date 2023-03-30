@@ -1,4 +1,4 @@
-import { describe, test, expect, vi } from 'vitest';
+import { describe, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import axios, { AxiosResponse, AxiosHeaders } from 'axios';
 import userEvent from '@testing-library/user-event';
@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event';
 import HomePage from '../../src/pages/HomePage';
 import { Cat } from '../../src/types/types';
 import { act } from 'react-dom/test-utils';
+import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('axios');
 
@@ -48,7 +49,7 @@ describe('<HomePage />', () => {
 		},
 	];
 
-	test('HomePage mounts properly', () => {
+	it('HomePage mounts properly', () => {
 		render(<HomePage />);
 
 		const selectInput = screen.getByLabelText('Breed');
@@ -83,7 +84,11 @@ describe('<HomePage />', () => {
 			mockResponse
 		);
 
-		const { getByLabelText } = render(<HomePage />);
+		const { getByLabelText } = render(
+			<MemoryRouter>
+				<HomePage />
+			</MemoryRouter>
+		);
 
 		const selectInput = getByLabelText('Breed');
 		fireEvent.change(selectInput, { target: { value: 'siam' } });
@@ -121,7 +126,11 @@ describe('<HomePage />', () => {
 	});
 
 	it('should display the load more button if a breed is selected', () => {
-		const { getByLabelText } = render(<HomePage />);
+		const { getByLabelText } = render(
+			<MemoryRouter>
+				<HomePage />
+			</MemoryRouter>
+		);
 
 		const selectInput = getByLabelText('Breed');
 
@@ -190,7 +199,11 @@ describe('<HomePage />', () => {
 			mockResponsePageTwo
 		);
 
-		const { getByLabelText } = render(<HomePage />);
+		const { getByLabelText } = render(
+			<MemoryRouter>
+				<HomePage />
+			</MemoryRouter>
+		);
 
 		const selectInput = getByLabelText('Breed');
 
