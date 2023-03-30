@@ -1,6 +1,8 @@
-import { describe, test, expect, vi } from 'vitest';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { describe, test, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+
 import { Cat } from '../../src/types/types';
+import CatCard from '../../src/components/CatCard';
 
 const catMockData: Cat = {
 	id: 'd55E_KMKZ',
@@ -32,10 +34,12 @@ describe('CatCard', () => {
 		const catBreedName = screen.getByText(catMockData.breeds?.[0]?.name ?? '');
 		expect(catBreedName).toBeInTheDocument();
 
-		const catBreedOrigin = screen.getByText(
+		const catBreedOriginElement = screen.getByRole('heading', {
+			name: /origin/i,
+		});
+		expect(catBreedOriginElement).toHaveTextContent(
 			catMockData.breeds?.[0]?.origin ?? ''
 		);
-		expect(catBreedOrigin).toBeInTheDocument();
 
 		const catBreedTemperament = screen.getByText(
 			catMockData.breeds?.[0]?.temperament ?? ''
