@@ -16,7 +16,7 @@ const BreedSelect: FC<BreedSelectProps> = ({ onChange, options, ...rest }) => {
 			{...rest}
 			onChange={(e: ChangeEvent<HTMLSelectElement>) => onChange(e.target.value)}
 		>
-			<option>Select breed</option>
+			<option value="">Select breed</option>
 			{options.map((option) => (
 				<option key={option.id} value={option.id}>
 					{option.name}

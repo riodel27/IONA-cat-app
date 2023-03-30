@@ -1,31 +1,48 @@
+import { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import Form from 'react-bootstrap/Form';
+
+import fetchCatsByBreed from '../api';
+import BreedSelect from '../components/BreedSelect';
 import CatList from '../components/CatList/CatList';
-import { Cat } from '../types/types';
+import { Cat, CatBreed } from '../types/types';
+
+const catBreeds: CatBreed[] = [
+	{ id: 'abys', name: 'Abyssinian' },
+	{ id: 'abob', name: 'American Bobtail' },
+	{ id: 'siam', name: 'Siamese' },
+];
 
 function HomePage() {
-	const mockData = [
-		{
-			id: '8pCFG7gCV',
-			url: 'https://cdn2.thecatapi.com/images/8pCFG7gCV.jpg',
-			width: 750,
-			height: 937,
-		},
-		{
-			id: '8ciqdpaO5',
-			url: 'https://cdn2.thecatapi.com/images/8ciqdpaO5.jpg',
-			width: 1080,
-			height: 809,
-		},
-	] as Cat[];
+	const [breed, setBreed] = useState('');
+	const [cats, setCats] = useState<Cat[]>([]);
+
+	useEffect(() => {
+		if (breed) {
+			const fetchCats = async () => {
+				const fetchedCats = await fetchCatsByBreed({ breedId: breed });
+				setCats(fetchedCats);
+			};
+			fetchCats().catch((error) => console.log(error));
+		}
+	}, [breed]);
+
+	const handleSelectBreedChange = (value: string) => {
+		setBreed(value);
+	};
 
 	return (
 		<div>
-			<Form.Select aria-label="Breed">
-				<option>Select breed</option>
-			</Form.Select>
+			<BreedSelect options={catBreeds} onChange={handleSelectBreedChange} />
 
-			<CatList cats={mockData} />
+			{!breed ? (
+				<>
+					<p>No cats available</p>
+				</>
+			) : (
+				<>
+					<CatList cats={cats} />
+				</>
+			)}
 
 			<Button>Load more</Button>
 		</div>
