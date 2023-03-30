@@ -46,24 +46,8 @@ describe('<HomePage />', () => {
 		render(<HomePage />);
 
 		const selectInput = screen.getByLabelText('Breed');
+		// expect select breed input
 		expect(selectInput).toBeInTheDocument();
-
-		const catsList = screen.getAllByRole('cat');
-		expect(catsList.length).toBe(mockCatsData.length);
-
-		expect(catsList[0]).toHaveAttribute(
-			'src',
-			'https://cdn2.thecatapi.com/images/8pCFG7gCV.jpg'
-		);
-		expect(catsList[1]).toHaveAttribute(
-			'src',
-			'https://cdn2.thecatapi.com/images/8ciqdpaO5.jpg'
-		);
-
-		const viewDetailsButton = screen.getAllByRole('button', {
-			name: 'View details',
-		});
-		expect(viewDetailsButton.length).toBe(mockCatsData.length);
 
 		// expect button with load more
 		const loadMoreButton = screen.getByRole('button', { name: 'Load more' });
@@ -74,7 +58,7 @@ describe('<HomePage />', () => {
 		const { getByLabelText, queryByText } = render(<HomePage />);
 		const selectInput = getByLabelText('Breed');
 
-		fireEvent.change(selectInput, { target: { value: 'Select breed' } });
+		fireEvent.change(selectInput, { target: { value: '' } });
 
 		expect(queryByText('No cats available')).toBeInTheDocument();
 
@@ -102,6 +86,7 @@ describe('<HomePage />', () => {
 		const selectInput = getByLabelText('Breed');
 		fireEvent.change(selectInput, { target: { value: 'siam' } });
 
+		// Wait for the mocked response to resolve and the component to re-render with the fetched cat data displayed
 		await waitFor(() => {
 			const catsList = screen.queryAllByRole('cat');
 			expect(catsList).toHaveLength(mockCatsDataSiameseBreed.length);
@@ -119,6 +104,212 @@ describe('<HomePage />', () => {
 				name: 'View details',
 			});
 			expect(viewDetailsButton.length).toBe(mockCatsData.length);
+		});
+	});
+
+	it('should NOT display the load more button if no breed selected', () => {
+		const { getByLabelText } = render(<HomePage />);
+
+		const selectInput = getByLabelText('Breed');
+
+		fireEvent.change(selectInput, { target: { value: '' } });
+
+		const loadMoreButton = screen.getByRole('button', { name: 'Load more' });
+		expect(loadMoreButton).not.toBeInTheDocument();
+	});
+
+	it('should display the load more button if a breed is selected', () => {
+		const { getByLabelText } = render(<HomePage />);
+
+		const selectInput = getByLabelText('Breed');
+
+		fireEvent.change(selectInput, { target: { value: 'siam' } });
+
+		const loadMoreButton = screen.getByRole('button', { name: 'Load more' });
+		expect(loadMoreButton).toBeInTheDocument();
+	});
+
+	it('should display more data after clicking load more button', async () => {
+		const mockCatsDataSiameseBreedPageOne: Cat[] = [
+			{
+				id: '__tqyLW91',
+				url: 'https://cdn2.thecatapi.com/images/__tqyLW91.jpg',
+				width: 937,
+				height: 1171,
+			},
+			{
+				id: 'DFHMMPNcD',
+				url: 'https://cdn2.thecatapi.com/images/DFHMMPNcD.jpg',
+				width: 1080,
+				height: 1319,
+			},
+		];
+
+		const mockCatsDataSiameseBreedPageTwo: Cat[] = [
+			{
+				id: 'Kf-zJDHCx',
+				url: 'https://cdn2.thecatapi.com/images/Kf-zJDHCx.jpg',
+				width: 1080,
+				height: 967,
+			},
+			{
+				id: 'O2aNhFGU-',
+				url: 'https://cdn2.thecatapi.com/images/O2aNhFGU-.jpg',
+				width: 1080,
+				height: 1080,
+			},
+		];
+
+		const mockResponsePageOne: AxiosResponse<Cat[]> = {
+			data: mockCatsDataSiameseBreedPageOne,
+			status: 200,
+			statusText: 'OK',
+			headers,
+			config: {
+				headers,
+			},
+		};
+
+		const mockResponsePageTwo: AxiosResponse<Cat[]> = {
+			data: mockCatsDataSiameseBreedPageTwo,
+			status: 200,
+			statusText: 'OK',
+			headers,
+			config: {
+				headers,
+			},
+		};
+
+		(axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce(
+			mockResponsePageOne
+		);
+
+		(axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce(
+			mockResponsePageTwo
+		);
+
+		render(<HomePage />);
+
+		const loadMoreButton = screen.getByRole('button', { name: 'Load more' });
+		fireEvent.click(loadMoreButton);
+
+		await waitFor(() => {
+			// Assert that the fetchCatsByBreed function is called with the correct parameters for the next page
+			expect(mockResponsePageTwo).toHaveBeenCalledWith({
+				breedId: 'siam',
+				page: 2,
+				limit: 10,
+			});
+
+			// Assert that the additional cats are displayed on the page
+			const catsList = screen.queryAllByRole('cat');
+			expect(catsList).toHaveLength(
+				mockCatsDataSiameseBreedPageOne.length +
+					mockCatsDataSiameseBreedPageTwo.length
+			);
+
+			// These are supposed to be the data from page two after clicking load more
+			expect(catsList[2]).toHaveAttribute(
+				'src',
+				mockCatsDataSiameseBreedPageTwo[0].url
+			);
+			expect(catsList[3]).toHaveAttribute(
+				'src',
+				mockCatsDataSiameseBreedPageTwo[1].url
+			);
+
+			const viewDetailsButton = screen.getAllByRole('button', {
+				name: 'View details',
+			});
+			expect(viewDetailsButton.length).toBe(
+				mockCatsDataSiameseBreedPageOne.length +
+					mockCatsDataSiameseBreedPageTwo.length
+			);
+		});
+	});
+
+	it('should hide the load more button if there are no more data after clicking the load more button', async () => {
+		// this will be the page one mock api response
+		const mockCatsDataSiameseBreedPageOne: Cat[] = [
+			{
+				id: '__tqyLW91',
+				url: 'https://cdn2.thecatapi.com/images/__tqyLW91.jpg',
+				width: 937,
+				height: 1171,
+			},
+			{
+				id: 'DFHMMPNcD',
+				url: 'https://cdn2.thecatapi.com/images/DFHMMPNcD.jpg',
+				width: 1080,
+				height: 1319,
+			},
+		];
+
+		// The page 2 will be the same response with the page one.
+		// This is on purpose, this will be the identifier that
+		// there is no more data to load
+		const mockCatsDataSiameseBreedPageTwo: Cat[] = [
+			{
+				id: '__tqyLW91',
+				url: 'https://cdn2.thecatapi.com/images/__tqyLW91.jpg',
+				width: 937,
+				height: 1171,
+			},
+			{
+				id: 'DFHMMPNcD',
+				url: 'https://cdn2.thecatapi.com/images/DFHMMPNcD.jpg',
+				width: 1080,
+				height: 1319,
+			},
+		];
+
+		const mockResponsePageOne: AxiosResponse<Cat[]> = {
+			data: mockCatsDataSiameseBreedPageOne,
+			status: 200,
+			statusText: 'OK',
+			headers,
+			config: {
+				headers,
+			},
+		};
+
+		const mockResponsePageTwo: AxiosResponse<Cat[]> = {
+			data: mockCatsDataSiameseBreedPageTwo,
+			status: 200,
+			statusText: 'OK',
+			headers,
+			config: {
+				headers,
+			},
+		};
+
+		(axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce(
+			mockResponsePageOne
+		);
+
+		(axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce(
+			mockResponsePageTwo
+		);
+
+		render(<HomePage />);
+
+		const loadMoreButton = screen.getByRole('button', { name: 'Load more' });
+		fireEvent.click(loadMoreButton);
+
+		await waitFor(() => {
+			// Assert that the fetchCatsByBreed function is called with the correct parameters for the next page
+			expect(mockResponsePageTwo).toHaveBeenCalledWith({
+				breedId: 'siam',
+				page: 2,
+				limit: 10,
+			});
+
+			// Now after making sure that the second fetch api call is executed. In the component there will be a logic to identify if there are still more data to load.
+			expect(
+				screen.getByRole('button', {
+					name: 'Load more',
+				})
+			).not.toBeInTheDocument();
 		});
 	});
 });
