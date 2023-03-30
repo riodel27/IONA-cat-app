@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { render } from '@testing-library/react';
-import App from './App';
+import App from '../src/App';
 
 describe('<App />', () => {
 	test('App mounts properly', () => {
@@ -9,6 +9,6 @@ describe('<App />', () => {
 
 		// Get by h1
 		const h1 = wrapper.container.querySelector('h1');
-		expect(h1?.textContent).toBe('IONA Test exercise cat application');
+		expect(h1?.textContent).toBe('Cat Browser');
 	});
 });
