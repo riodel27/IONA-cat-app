@@ -4,3 +4,8 @@ export interface Cat {
 	width: number;
 	height: number;
 }
+
+export interface CatBreed {
+	id: string;
+	name: string;
+}
