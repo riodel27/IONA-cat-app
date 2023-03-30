@@ -31,11 +31,19 @@ function HomePage() {
 					limit: 10,
 				});
 
-				// This is to check if the last fetched cats response already exist in the current list of cats state.
-				// If it's true, the result will be an empty array.
+				// This code is used to verify wether the most recent response
+				// received for cats already present in the current list of
+				// cat data. If this is the case, the outcome of the code
+				// will be an empty array.
 				const result = differenceWith(fetchedCats, cats, isEqual);
 
-				// This means that there are no more cats to be fetched
+				// This code block checks if there are more cats to be fetched.
+				// If the result array is empty, which indicates that there are no
+				// more cats to be fetched, then the setHasMoreCats function
+				// is called to set the hasMoreCats state to false. Otherwise,
+				// the setCats function is called to append the newly fetched
+				// cat data (fetchedCats) to the previous cat data (prevCats)
+				// using the spread operator.
 				if (!result.length) {
 					setHasMoreCats(false);
 				} else {
