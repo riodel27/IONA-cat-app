@@ -71,6 +71,8 @@ function HomePage() {
 	};
 	return (
 		<div>
+			<h1>Cat Browser</h1>
+
 			<BreedSelect options={catBreeds} onChange={handleSelectBreedChange} />
 
 			{!breed ? (
