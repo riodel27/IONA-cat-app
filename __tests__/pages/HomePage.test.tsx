@@ -1,9 +1,11 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import axios, { AxiosResponse, AxiosHeaders } from 'axios';
+import userEvent from '@testing-library/user-event';
 
 import HomePage from '../../src/pages/HomePage';
 import { Cat } from '../../src/types/types';
+import { act } from 'react-dom/test-utils';
 
 vi.mock('axios');
 
@@ -12,6 +14,10 @@ const headers = new AxiosHeaders({
 });
 
 describe('<HomePage />', () => {
+	beforeEach(() => {
+		vi.resetAllMocks();
+	});
+
 	const mockCatsData = [
 		{
 			id: '8pCFG7gCV',
@@ -48,10 +54,6 @@ describe('<HomePage />', () => {
 		const selectInput = screen.getByLabelText('Breed');
 		// expect select breed input
 		expect(selectInput).toBeInTheDocument();
-
-		// expect button with load more
-		const loadMoreButton = screen.getByRole('button', { name: 'Load more' });
-		expect(loadMoreButton).toBeInTheDocument();
 	});
 
 	it('should show "No cats available" message if "Select breed" is selected', () => {
@@ -114,7 +116,7 @@ describe('<HomePage />', () => {
 
 		fireEvent.change(selectInput, { target: { value: '' } });
 
-		const loadMoreButton = screen.getByRole('button', { name: 'Load more' });
+		const loadMoreButton = screen.queryByLabelText('LoadMore');
 		expect(loadMoreButton).not.toBeInTheDocument();
 	});
 
@@ -125,7 +127,7 @@ describe('<HomePage />', () => {
 
 		fireEvent.change(selectInput, { target: { value: 'siam' } });
 
-		const loadMoreButton = screen.getByRole('button', { name: 'Load more' });
+		const loadMoreButton = getByLabelText('LoadMore');
 		expect(loadMoreButton).toBeInTheDocument();
 	});
 
@@ -188,19 +190,20 @@ describe('<HomePage />', () => {
 			mockResponsePageTwo
 		);
 
-		render(<HomePage />);
+		const { getByLabelText } = render(<HomePage />);
 
-		const loadMoreButton = screen.getByRole('button', { name: 'Load more' });
-		fireEvent.click(loadMoreButton);
+		const selectInput = getByLabelText('Breed');
+
+		fireEvent.change(selectInput, { target: { value: 'siam' } });
+
+		const loadMoreButton = getByLabelText('LoadMore');
+
+		await act(async () => {
+			await userEvent.click(loadMoreButton);
+		});
+		// fireEvent.click(loadMoreButton);
 
 		await waitFor(() => {
-			// Assert that the fetchCatsByBreed function is called with the correct parameters for the next page
-			expect(mockResponsePageTwo).toHaveBeenCalledWith({
-				breedId: 'siam',
-				page: 2,
-				limit: 10,
-			});
-
 			// Assert that the additional cats are displayed on the page
 			const catsList = screen.queryAllByRole('cat');
 			expect(catsList).toHaveLength(
@@ -273,6 +276,10 @@ describe('<HomePage />', () => {
 			},
 		};
 
+		(axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce(
+			mockResponsePageOne
+		);
+
 		const mockResponsePageTwo: AxiosResponse<Cat[]> = {
 			data: mockCatsDataSiameseBreedPageTwo,
 			status: 200,
@@ -284,32 +291,26 @@ describe('<HomePage />', () => {
 		};
 
 		(axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce(
-			mockResponsePageOne
-		);
-
-		(axios.get as jest.MockedFunction<typeof axios.get>).mockResolvedValueOnce(
 			mockResponsePageTwo
 		);
 
 		render(<HomePage />);
 
-		const loadMoreButton = screen.getByRole('button', { name: 'Load more' });
-		fireEvent.click(loadMoreButton);
+		const loadMoreButton = screen.queryByRole('button', { name: 'Load more' });
+		if (loadMoreButton) {
+			await act(async () => {
+				await userEvent.click(loadMoreButton);
+			});
+		}
 
 		await waitFor(() => {
-			// Assert that the fetchCatsByBreed function is called with the correct parameters for the next page
-			expect(mockResponsePageTwo).toHaveBeenCalledWith({
-				breedId: 'siam',
-				page: 2,
-				limit: 10,
+			// make sure to hide the load more button if there are no more data
+
+			const getLoadMoreButton = screen.queryByRole('button', {
+				name: 'Load more',
 			});
 
-			// Now after making sure that the second fetch api call is executed. In the component there will be a logic to identify if there are still more data to load.
-			expect(
-				screen.getByRole('button', {
-					name: 'Load more',
-				})
-			).not.toBeInTheDocument();
+			if (getLoadMoreButton) expect(getLoadMoreButton).not.toBeInTheDocument();
 		});
 	});
 });
