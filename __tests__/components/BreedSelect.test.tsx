@@ -1,4 +1,4 @@
-import { describe, test, expect, vi } from 'vitest';
+import { describe, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 
 import BreedSelect from '../../src/components/BreedSelect';
@@ -11,7 +11,7 @@ const catBreeds: CatBreed[] = [
 ];
 
 describe('BreedSelect', () => {
-	test('should render the select input with options', () => {
+	it('should render the select input with options', () => {
 		const onChange = vi.fn();
 		const { getByLabelText, getByText } = render(
 			<BreedSelect options={catBreeds} onChange={onChange} />
@@ -30,7 +30,7 @@ describe('BreedSelect', () => {
 		});
 	});
 
-	test('should call onChange when an option is selected', () => {
+	it('should call onChange when an option is selected', () => {
 		const onChange = vi.fn();
 		const { getByLabelText } = render(
 			<BreedSelect options={catBreeds} onChange={onChange} />

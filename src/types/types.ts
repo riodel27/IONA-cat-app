@@ -3,9 +3,13 @@ export interface Cat {
 	url: string;
 	width: number;
 	height: number;
+	breeds?: CatBreed[];
 }
 
 export interface CatBreed {
 	id: string;
 	name: string;
+	temperament?: string;
+	origin?: string;
+	description?: string;
 }
