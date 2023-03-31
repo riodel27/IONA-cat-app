@@ -1,5 +1,6 @@
 import { ChangeEvent, FC } from 'react';
 import Form from 'react-bootstrap/Form';
+import styled from 'styled-components';
 
 interface BreedSelectProps {
 	options: {
@@ -7,22 +8,40 @@ interface BreedSelectProps {
 		name: string;
 	}[];
 	onChange: (value: string) => void;
+	breed: string;
 }
 
-const BreedSelect: FC<BreedSelectProps> = ({ onChange, options, ...rest }) => {
+const StyledFormSelect = styled(Form.Select)`
+	max-width: 300px; /* set max width for mobile devices */
+	width: 100%; /* make sure it takes up full width */
+	margin-top: 0.5rem;
+`;
+
+const BreedSelect: FC<BreedSelectProps> = ({
+	onChange,
+	options,
+	breed,
+	...rest
+}) => {
 	return (
-		<Form.Select
-			aria-label="Breed"
-			{...rest}
-			onChange={(e: ChangeEvent<HTMLSelectElement>) => onChange(e.target.value)}
-		>
-			<option value="">Select breed</option>
-			{options.map((option) => (
-				<option key={option.id} value={option.id}>
-					{option.name}
-				</option>
-			))}
-		</Form.Select>
+		<>
+			<label htmlFor="">Breed</label>
+			<StyledFormSelect
+				aria-label="Breed"
+				value={breed}
+				{...rest}
+				onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+					onChange(e.target.value)
+				}
+			>
+				<option value="">Select breed</option>
+				{options.map((option) => (
+					<option key={option.id} value={option.id}>
+						{option.name}
+					</option>
+				))}
+			</StyledFormSelect>
+		</>
 	);
 };
 

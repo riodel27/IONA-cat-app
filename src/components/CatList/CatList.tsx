@@ -1,33 +1,31 @@
-import * as React from 'react';
-import { Button } from 'react-bootstrap';
+import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Cat } from '../../types/types';
+import { GridContainer } from './styled';
+import CatCard from './CatCard';
 
 interface Props {
 	cats: Cat[];
 }
 
-const CatList: React.FC<Props> = ({ cats }) => {
+const CatList: FC<Props> = ({ cats }) => {
 	const navigate = useNavigate();
 
-	const handleButtonClick = (id: string) => {
+	const handleViewCatDetailsClick = (id: string) => {
 		navigate(`/${id}`);
 	};
 
 	return (
-		<div>
-			<ul>
-				{cats.map((cat) => (
-					<li key={cat.id}>
-						<img src={cat.url} alt={cat.id} role="cat" />
-						<Button onClick={() => handleButtonClick(cat.id)}>
-							View details
-						</Button>
-					</li>
-				))}
-			</ul>
-		</div>
+		<GridContainer>
+			{cats.map((cat) => (
+				<CatCard
+					key={cat.id}
+					cat={cat}
+					handleViewCatDetailsClick={handleViewCatDetailsClick}
+				/>
+			))}
+		</GridContainer>
 	);
 };
 
