@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 import { Cat } from '../../src/types/types';
-import CatCard from '../../src/components/CatCard';
+import CatCard from '../../src/components/SingleCatCard/CatCard';
 
 const catMockData: Cat = {
 	id: 'd55E_KMKZ',
