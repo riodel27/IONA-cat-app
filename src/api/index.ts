@@ -7,6 +7,16 @@ interface ApiParams {
 	limit?: number;
 }
 
+//  fake api to simulate error
+function fetchSomeData() {
+	return new Promise((resolve, reject) => {
+		reject('API call failed!');
+	});
+}
+
+const genericApiErrorMessage =
+	'Apologies but we could not load new cats for you at this time! Miau!';
+
 const fetchCatsByBreed = async ({
 	breedId,
 	page = 1,
@@ -21,7 +31,7 @@ const fetchCatsByBreed = async ({
 	} catch (error) {
 		// Handle error here
 		console.error('Error fetching cats: ', error);
-		throw new Error('Unable to fetch cats. Please try again later.');
+		throw new Error(genericApiErrorMessage);
 	}
 };
 
@@ -31,15 +41,17 @@ const fetchCatById = async (catId: string): Promise<Cat> => {
 			`https://api.thecatapi.com/v1/images/${catId}`
 		);
 
+		// await fetchSomeData();
+
 		return response?.data;
 	} catch (error) {
 		// Handle error here
 		console.error('Error fetching cat: ', error);
-		throw new Error('Unable to fetch cat. Please try again later.');
+		throw new Error(genericApiErrorMessage);
 	}
 };
 
-export const fetchCatBreeds = async (): Promise<CatBreed[]> => {
+const fetchCatBreeds = async (): Promise<CatBreed[]> => {
 	try {
 		const response = await axios.get<CatBreed[]>(
 			'https://api.thecatapi.com/v1/breeds'
@@ -48,8 +60,8 @@ export const fetchCatBreeds = async (): Promise<CatBreed[]> => {
 		return response.data;
 	} catch (error) {
 		console.error('failed to fetch cat breeds: ', error);
-		throw new Error(`Failed to fetch cat breeds`);
+		throw new Error(genericApiErrorMessage);
 	}
 };
 
-export { fetchCatsByBreed, fetchCatById };
+export { fetchCatsByBreed, fetchCatById, fetchCatBreeds };

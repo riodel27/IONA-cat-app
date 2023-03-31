@@ -10,6 +10,17 @@ import { CatBreedsContext } from '../contexts/CatBreedsContext';
 const HomePageContainer = styled.div`
 	padding: 1rem;
 
+	.header {
+		position: sticky;
+		top: 0;
+		background-color: #fff;
+		z-index: 1;
+		padding: 1rem;
+		display: flex;
+		flex-direction: column;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	}
+
 	@media (min-width: 768px) {
 		padding: 2rem;
 	}
@@ -37,7 +48,7 @@ function HomePage() {
 
 	return (
 		<HomePageContainer>
-			<div>
+			<div className="header">
 				<h1>Cat Browser</h1>
 
 				<BreedSelect

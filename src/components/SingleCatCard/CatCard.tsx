@@ -21,7 +21,7 @@ const CatCard: FC<Props> = ({ cat }: Props) => {
 	const navigate = useNavigate();
 
 	const handleBackButtonClick = (breed: string) => {
-		navigate(`/?breed=${breed}`);
+		navigate?.(breed ? `/?breed=${breed}` : '/');
 	};
 
 	return (
