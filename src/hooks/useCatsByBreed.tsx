@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { fetchCatsByBreed } from '../api';
 import { Cat } from '../types/types';
+import { useAlert } from '../contexts/AlertContext';
 
 type UseCatsByBreed = () => {
 	cats: Cat[];
@@ -16,6 +17,8 @@ type UseCatsByBreed = () => {
 };
 
 const useCatsByBreed: UseCatsByBreed = () => {
+	const { addAlert } = useAlert();
+
 	const [searchParams] = useSearchParams();
 	const breedParam = searchParams.get('breed') ?? '';
 
@@ -63,7 +66,10 @@ const useCatsByBreed: UseCatsByBreed = () => {
 			};
 
 			fetchCats()
-				.catch((error) => console.log(error))
+				.catch((error) => {
+					console.error(error);
+					addAlert((error as { message: string }).message, 'danger');
+				})
 				.finally(() => {
 					setIsFetchingMoreCats(false);
 				});
