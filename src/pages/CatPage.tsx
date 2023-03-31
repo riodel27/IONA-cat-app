@@ -1,30 +1,27 @@
-import { useEffect, useState } from 'react';
-import CatCard from '../components/CatCard';
 import { useParams } from 'react-router-dom';
-import { fetchCatById } from '../api';
-import { Cat } from '../types/types';
+import styled from 'styled-components';
+
+import CatCard from '../components/SingleCatCard/CatCard';
+import useCatById from '../hooks/useCatById';
+
+const CatPageContainer = styled.div`
+	padding: 20px;
+
+	@media (max-width: 768px) {
+		padding: 10px;
+	}
+`;
 
 function CatPage() {
 	const { id } = useParams();
 
-	const [cat, setCat] = useState<Cat | null>(null);
+	const cat = useCatById(id || null);
 
-	useEffect(() => {
-		if (id) {
-			const fetchData = async () => {
-				try {
-					const catData = await fetchCatById(id);
-
-					setCat(catData);
-				} catch (error) {
-					console.error(error);
-				}
-			};
-			fetchData().catch((error) => console.log(error));
-		}
-	}, [id]);
-
-	return <>{<CatCard cat={cat} />}</>;
+	return (
+		<CatPageContainer>
+			<CatCard cat={cat} />
+		</CatPageContainer>
+	);
 }
 
 export default CatPage;
