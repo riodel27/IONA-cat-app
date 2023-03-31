@@ -1,19 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { differenceWith, isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import differenceWith from 'lodash/differenceWith';
 
 import { fetchCatsByBreed } from '../api';
 import BreedSelect from '../components/BreedSelect';
 import CatList from '../components/CatList/CatList';
-import { Cat, CatBreed } from '../types/types';
-
-const catBreeds: CatBreed[] = [
-	{ id: 'abys', name: 'Abyssinian' },
-	{ id: 'abob', name: 'American Bobtail' },
-	{ id: 'siam', name: 'Siamese' },
-];
+import { Cat } from '../types/types';
+import { CatBreedsContext } from '../contexts/CatBreedsContext';
 
 function HomePage() {
+	const { catBreeds } = useContext(CatBreedsContext);
+
 	const [breed, setBreed] = useState('');
 	const [cats, setCats] = useState<Cat[]>([]);
 	const [page, setPage] = useState(1);

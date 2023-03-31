@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { Cat } from '../types/types';
+import { Cat, CatBreed } from '../types/types';
 
 interface ApiParams {
 	breedId: string;
@@ -36,6 +36,19 @@ const fetchCatById = async (catId: string): Promise<Cat> => {
 		// Handle error here
 		console.error('Error fetching cat: ', error);
 		throw new Error('Unable to fetch cat. Please try again later.');
+	}
+};
+
+export const fetchCatBreeds = async (): Promise<CatBreed[]> => {
+	try {
+		const response = await axios.get<CatBreed[]>(
+			'https://api.thecatapi.com/v1/breeds'
+		);
+
+		return response.data;
+	} catch (error) {
+		console.error('failed to fetch cat breeds: ', error);
+		throw new Error(`Failed to fetch cat breeds`);
 	}
 };
 
